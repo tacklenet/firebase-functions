@@ -1,15 +1,16 @@
 const admin = require("firebase-admin");
 const functions = require("firebase-functions");
+const db = admin.firestore();
+db.settings({
+  ignoreUndefinedProperties: true
+});
 
 const axios = require("axios").default;
 const imgur = require("imgur");
 
-const db = admin.firestore();
-
 const headers = require("./config");
 
 exports.handler = async (change, context) => {
-  const id = context.params.id;
   const fsdata = change.after.exists ? change.after.data() : null;
   const previousFsData = change.before.exists ? change.before.data() : null;
 
@@ -19,9 +20,12 @@ exports.handler = async (change, context) => {
   }
 
   //prevent infinite loop
-  if (fsdata?.id === previousFsData?.id) {
+  if (fsdata === previousFsData) {
     return null;
   }
+
+  //set id from after data
+  const id = fsdata.id;
 
   imgur.setClientId("1cda4cbf2fc4587");
   imgur.setAPIUrl("https://api.imgur.com/3/");
@@ -29,18 +33,24 @@ exports.handler = async (change, context) => {
   //Post//
   let optionsPost = {
     method: "GET",
-    url: "https://instagram68.p.rapidapi.com/p/" + id,
-    headers: headers("instagram68.p.rapidapi.com")
+    url: "https://instagram40.p.rapidapi.com/media-info",
+    params: {code: id},
+    headers: headers("instagram40.p.rapidapi.com")
   };
+
   // fetch data from a url endpoint
   const response = await axios
     .request(optionsPost)
-    .catch(err => console.log(err));
+    .catch(err => console.log(err.response));
   const data = await response.data;
 
-  const username = data.author.username;
-  const image = await imgur.uploadUrl(data.previews.original);
-  ////
+  const username = data.owner.username;
+  const displayname = data.owner.full_name;
+  const image = await imgur.uploadUrl(data.display_url);
+  const created = data.taken_at_timestamp;
+  const caption = data.accessibility_caption;
+  const shortcode = data.shortcode;
+
   //User//
   var optionsUser = {
     method: "GET",
@@ -51,10 +61,14 @@ exports.handler = async (change, context) => {
   // fetch data from a url endpoint
   const response2 = await axios
     .request(optionsUser)
-    .catch(err => console.log(err));
+    .catch(err => console.log(err.response));
   const data2 = await response2.data;
 
   const image2 = await imgur.uploadUrl(data2.profile_pic_url_hd);
+  const bio = data2.biography;
+  const externalurl = data2.external_url;
+  const following = data2.edge_follow.count;
+  const followers = data2.edge_followed_by.count;
   ////
 
   const batch = db.batch();
@@ -63,18 +77,19 @@ exports.handler = async (change, context) => {
     db.collection("lures").doc(data.shortcode),
     {
       username: username,
-      displayname: data.author.full_name,
+      displayname: displayname,
+      caption: caption,
       avatar: image2.link,
       image: image.link,
-      description: data.caption,
-      id: data.shortcode,
-      created: data.created_at,
-      timestamp: admin.firestore.FieldValue.serverTimestamp(),
-      category: fsdata.category,
-      subcategory: fsdata.subcategory,
-      key: fsdata.key,
-      name: fsdata.name,
-      price: fsdata.price
+      id: shortcode,
+      created: created,
+      description: fsdata?.description,
+      category: fsdata?.category,
+      subcategory: fsdata?.subcategory,
+      key: fsdata?.key,
+      name: fsdata?.name,
+      price: fsdata?.price,
+      timestamp: admin.firestore.FieldValue.serverTimestamp()
     },
     {merge: true}
   );
@@ -82,11 +97,13 @@ exports.handler = async (change, context) => {
   batch.set(
     db.collection("users").doc(username),
     {
-      bio: data.author.biography,
-      externalurl: data.author.external_url,
-      displayname: data.author.display_name,
+      bio: bio,
+      externalurl: externalurl,
+      displayname: displayname,
       avatar: image2.link,
       username: username,
+      following: following,
+      followers: followers,
       timestamp: admin.firestore.FieldValue.serverTimestamp()
     },
     {merge: true}

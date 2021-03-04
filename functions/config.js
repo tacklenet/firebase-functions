@@ -14,8 +14,7 @@ if (process.env.NODE_ENV !== "production") {
 function headers(host) {
   var headers = {
     "x-rapidapi-key": config.config.rapidkey,
-    "x-rapidapi-host": host,
-    useQueryString: true
+    "x-rapidapi-host": host
   };
 
   return headers;
