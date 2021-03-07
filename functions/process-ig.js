@@ -1,6 +1,7 @@
 const admin = require("firebase-admin");
 const functions = require("firebase-functions");
 const db = admin.firestore();
+
 db.settings({
   ignoreUndefinedProperties: true
 });
@@ -24,7 +25,6 @@ exports.handler = async (change, context) => {
     return null;
   }
 
-  //set id from after data
   const id = fsdata.id;
 
   imgur.setClientId("1cda4cbf2fc4587");
@@ -34,7 +34,7 @@ exports.handler = async (change, context) => {
   let optionsPost = {
     method: "GET",
     url: "https://instagram40.p.rapidapi.com/media-info",
-    params: {code: id},
+    params: { code: id },
     headers: headers("instagram40.p.rapidapi.com")
   };
 
@@ -55,7 +55,7 @@ exports.handler = async (change, context) => {
   var optionsUser = {
     method: "GET",
     url: "https://instagram40.p.rapidapi.com/account-info",
-    params: {username: username},
+    params: { username: username },
     headers: headers("instagram40.p.rapidapi.com")
   };
   // fetch data from a url endpoint
@@ -83,19 +83,18 @@ exports.handler = async (change, context) => {
       image: image.link,
       id: shortcode,
       created: created,
-      description: fsdata?.description,
-      category: fsdata?.category,
-      subcategory: fsdata?.subcategory,
-      key: fsdata?.key,
-      name: fsdata?.name,
-      price: fsdata?.price,
+      description: fsdata.description,
+      category: fsdata.category,
+      subcategory: fsdata.subcategory,
+      key: fsdata.key,
+      name: fsdata.name,
+      price: fsdata.price,
       timestamp: admin.firestore.FieldValue.serverTimestamp()
     },
-    {merge: true}
+    { merge: true }
   );
-
   batch.set(
-    db.collection("users").doc(username),
+    db.collection("makers").doc(username),
     {
       bio: bio,
       externalurl: externalurl,
@@ -106,7 +105,7 @@ exports.handler = async (change, context) => {
       followers: followers,
       timestamp: admin.firestore.FieldValue.serverTimestamp()
     },
-    {merge: true}
+    { merge: true }
   );
 
   return batch.commit();
