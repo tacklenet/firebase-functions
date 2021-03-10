@@ -20,4 +20,9 @@ function headers(host) {
   return headers;
 }
 
+function magickey() {
+  return config.config.magickey;
+}
+
 module.exports = headers;
+module.exports = magickey;
