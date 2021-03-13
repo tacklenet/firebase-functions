@@ -11,18 +11,11 @@ if (process.env.NODE_ENV !== "production") {
   }
 }
 
-function headers(host) {
+module.exports = function headers(host) {
   var headers = {
     "x-rapidapi-key": config.config.rapidkey,
     "x-rapidapi-host": host
   };
 
   return headers;
-}
-
-function magickey() {
-  return config.config.magickey;
-}
-
-module.exports = headers;
-module.exports = magickey;
+};

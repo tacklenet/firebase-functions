@@ -8,7 +8,7 @@ db.settings({
 
 const axios = require("axios").default;
 const imgur = require("imgur");
-const headers = require("./config");
+const headers = require("./config-rapidapi");
 
 exports.handler = async (change, context) => {
   const fsdata = change.after.exists ? change.after.data() : null;
@@ -28,6 +28,8 @@ exports.handler = async (change, context) => {
 
   imgur.setClientId("1cda4cbf2fc4587");
   imgur.setAPIUrl("https://api.imgur.com/3/");
+
+  console.log(headers("instagram40.p.rapidapi.com"));
 
   //Post//
   let optionsPost = {
