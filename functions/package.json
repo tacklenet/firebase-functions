@@ -20,7 +20,7 @@
     "firebase-functions": "^3.11.0",
     "fs": "^0.0.1-security",
     "imgur": "^0.3.2",
-    "magic-sdk": "^4.1.1"
+    "@magic-sdk/admin": "1.0.0"
   },
   "devDependencies": {
     "eslint": "^7.6.0",
