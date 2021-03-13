@@ -42,7 +42,9 @@ const handleNewUser = async email => {
 exports.auth = functions.https.onCall(async (data, context) => {
   const { Magic } = require("@magic-sdk/admin");
   const magickey = require("./config-magickey");
-  const magic = new Magic(magickey);
+
+  console.log(magickey());
+  const magic = new Magic(magickey());
   const didToken = data.didToken;
   const metadata = await magic.users.getMetadataByToken(didToken);
   const email = metadata.email;
