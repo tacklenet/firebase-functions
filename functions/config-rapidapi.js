@@ -12,9 +12,9 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 module.exports = function headers(host) {
-  var headers = {
+  const headers = {
     "x-rapidapi-key": config.config.rapidkey,
-    "x-rapidapi-host": host
+    "x-rapidapi-host": host,
   };
 
   return headers;

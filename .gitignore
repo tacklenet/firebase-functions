@@ -1,6 +1,7 @@
 env.json*
 package-lock.json*
 .DS_Store*
+tackle-net-firebase-adminsdk.json*
 
 # Logs
 logs
