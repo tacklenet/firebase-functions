@@ -2,14 +2,26 @@ const functions = require("firebase-functions");
 
 // The Firebase Admin SDK to access Firestore.
 const admin = require("firebase-admin");
-const serviceAccount = require("./tackle-net-firebase-adminsdk.json");
+const adminsdk = require("./config-adminsdk");
+const serviceAccount = require(adminsdk());
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://tackle-net.firebaseio.com",
 });
 
+const db = admin.firestore();
+
+db.settings({
+  ignoreUndefinedProperties: true,
+});
+
+const newuser = require("./newuser");
 const processIG = require("./process-ig");
+
+exports.newuser = functions.firestore
+    .document("/users/{id}")
+    .onCreate(newuser.handler);
 
 exports.processIG = functions.firestore
     .document("/submissions/{id}")

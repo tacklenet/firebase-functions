@@ -1,10 +1,6 @@
 const admin = require("firebase-admin");
 const db = admin.firestore();
 
-db.settings({
-  ignoreUndefinedProperties: true,
-});
-
 const axios = require("axios").default;
 const imgur = require("imgur");
 const headers = require("./config-rapidapi");
@@ -28,8 +24,6 @@ exports.handler = async (change, context) => {
   imgur.setClientId("1cda4cbf2fc4587");
   imgur.setAPIUrl("https://api.imgur.com/3/");
 
-  console.log(headers("instagram40.p.rapidapi.com"));
-
   // Post//
   const optionsPost = {
     method: "GET",
@@ -45,6 +39,13 @@ exports.handler = async (change, context) => {
   const data = await response.data;
 
   const username = data.owner.username;
+
+  // exit if username does not match submitter
+  if (fsdata.username != username) {
+    console.log("User not the same IG poster!");
+    return null;
+  }
+
   const displayname = data.owner.full_name;
   const image = await imgur.uploadUrl(data.display_url);
   const created = data.taken_at_timestamp;
