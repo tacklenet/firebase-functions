@@ -3,19 +3,18 @@ const functions = require("firebase-functions");
 // The Firebase Admin SDK to access Firestore.
 const admin = require("firebase-admin");
 const adminsdk = require("./config-adminsdk");
-const serviceAccount = require(adminsdk());
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
+  credential: admin.credential.cert(adminsdk()),
   databaseURL: "https://tackle-net.firebaseio.com",
 });
 
 const db = admin.firestore();
-
 db.settings({
   ignoreUndefinedProperties: true,
 });
 
+// Functions
 const newuser = require("./newuser");
 const processIG = require("./process-ig");
 
