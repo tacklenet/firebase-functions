@@ -16,7 +16,7 @@ module.exports = function adminsdk(host) {
     type: "service_account",
     project_id: "tackle-net",
     private_key_id: config.config.private_key_id,
-    private_key: config.config.private_key,
+    private_key: config.config.private_key.replace(/\\n/g, "\n"),
     client_email: "firebase-adminsdk-55yp5@tackle-net.iam.gserviceaccount.com",
     client_id: "113910551376909776800",
     auth_uri: "https://accounts.google.com/o/oauth2/auth",
